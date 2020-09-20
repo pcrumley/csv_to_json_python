@@ -3,5 +3,6 @@
 # i never use good structure in my code. let's set if this works
 
 
-def run(csvfile: str):
-    print(f"hello, {csvfile}!")
+def run(csv_in: str, json_out: str):
+    print(f"csv: {csv_in}")
+    print(f"json: {json_out}")
