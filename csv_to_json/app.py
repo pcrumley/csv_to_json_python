@@ -15,19 +15,27 @@ def run(csv_list, json_list, **kwargs):
 
 
 def convert(csv_in: str, json_out: str, **kwargs):
+    # first convert the csv into a list of dictionaries
+    # in: csv that looks like
+    # full_name,email
+    # John Smith,THE_Smiths_Fan02@aol.com
+    # ...
+    #
+    # out: list of dictionaries that looks like
+    # [
+    #    {
+    #       "user_id": 1
+    #       "first name": "John",
+    #       "last name": "Smith"
+    #       "email": "THE_Smiths_Fan02@aol.com",
+    #    }
+    # ]
     user_list = csv_to_user_list(csv_in, **kwargs)
 
-    # now we need to convert to our schema.
+    # now we need to add the metadata
     # {
-    #   "user_list_size": "integer, length of the user _list",
-    #   "user_list": [
-    #      {
-    #         "list_id": "integer, sequence number for this user starts at 1",
-    #         "first name": "string, first name of this user",
-    #         "last name": "string, last name of this user",
-    #         "email": "string, email address of this user"
-    #      }
-    #   ]
+    #   "user_list_size": "integer, length of the user_list",
+    #   "user_list": "The list described above."
     # }
 
     json_obj = {
@@ -35,6 +43,7 @@ def convert(csv_in: str, json_out: str, **kwargs):
         "user_list": user_list,
     }
 
+    # write it to a file
     with open(json_out, 'w') as jsonfile:
         # pretty print for easier debug
         json.dump(json_obj, jsonfile, indent = "  ")
@@ -88,7 +97,7 @@ def csv_to_user_list(csv_in: str, **kwargs) -> list:
         """
 
         new_user_dict = {
-            "list id": f"{i+1}",
+            "list id": i+1,
             "first name": "",
             "last name": "",
             "email": ""
@@ -124,13 +133,13 @@ def parse_name(full_name: str, user_dict: dict, **kwargs):
     """ A function that takes in a full name and a dictionary of the form
 
     user_dict = {
-        "list id": f"{i+1}",
+        "list id": i+1,
         "first name": "",
         "last name": "",
         "email": ""
     }
 
-    it will set the first and last name values.
+    and it will set the first and last name values.
 
     We assume the names are split on whitespace and that the first word
     corresponds to the first name and the rest of the words are the last name.
