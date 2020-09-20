@@ -4,9 +4,12 @@ import sys
 
 
 def run(csv_list, json_list, **kwargs):
+    """ The main loop of the program, goes over each csvfile in the csvlist
+    and writes the json file @ json_list.
+    """
     for infile, outfile in zip(csv_list, json_list):
         try:
-            convert(infile, outfile, **kwargs)
+            extract_transform_write(infile, outfile, **kwargs)
 
         except CSVSchemaError:
             print(
@@ -14,7 +17,12 @@ def run(csv_list, json_list, **kwargs):
                file=sys.stderr)
 
 
-def convert(csv_in: str, json_out: str, **kwargs):
+def extract_transform_write(csv_in: str, json_out: str, **kwargs):
+    """
+    The main logical part of the code. Is passed a csv, and
+    a location to write a Json File. Will raise an CSVSchemaError
+    if csv_schema is unexpected.
+    """
     # first convert the csv into a list of dictionaries
     # in: csv that looks like
     # full_name,email
@@ -24,7 +32,7 @@ def convert(csv_in: str, json_out: str, **kwargs):
     # out: list of dictionaries that looks like
     # [
     #    {
-    #       "user_id": 1
+    #       "list_id": 1
     #       "first name": "John",
     #       "last name": "Smith"
     #       "email": "THE_Smiths_Fan02@aol.com",
@@ -46,13 +54,29 @@ def convert(csv_in: str, json_out: str, **kwargs):
     # write it to a file
     with open(json_out, 'w') as jsonfile:
         # pretty print for easier debug
-        json.dump(json_obj, jsonfile, indent = "  ")
-
+        json.dump(json_obj, jsonfile, indent="  ")
 
 
 def csv_to_user_list(csv_in: str, **kwargs) -> list:
-    # first we will make a list structured like
-    # [{"full_name": "John Smith" "email": "THE_Smiths_Fan02@aol.com"}..]
+    """
+    Extracts the data from the csv
+    full_name,email
+    John Smith,THE_Smiths_Fan02@aol.com
+    ...
+    and returns a list structured like
+    [
+        {
+            "list_id": 1,
+            "first name": "John",
+            "last name": "Smith",
+            "email": "THE_Smiths_Fan02@aol.com"
+        }
+        ...
+    ]
+
+
+    """
+
 
     user_list = []
     with open(csv_in, newline='') as csv_file:
@@ -97,7 +121,7 @@ def csv_to_user_list(csv_in: str, **kwargs) -> list:
         """
 
         new_user_dict = {
-            "list id": i+1,
+            "list_id": i+1,
             "first name": "",
             "last name": "",
             "email": ""
@@ -133,7 +157,7 @@ def parse_name(full_name: str, user_dict: dict, **kwargs):
     """ A function that takes in a full name and a dictionary of the form
 
     user_dict = {
-        "list id": i+1,
+        "list_id": i+1,
         "first name": "",
         "last name": "",
         "email": ""
@@ -153,13 +177,13 @@ def parse_name(full_name: str, user_dict: dict, **kwargs):
     split_name = full_name.split(' ')
     if len(split_name) == 0 and kwargs.show_warnings:
         print(
-            "Warning: user {user_id} has no name, {split_name[0]}",
+            "Warning: user {user_dict[list_id]} has no name, {split_name[0]}",
             file=sys.stderr)
 
     elif len(split_name) == 1:
         if kwargs.show_warnings:
             print(
-                "Warning: user {user_id} has only 1 name, {split_name[0]}",
+                "Warning: user {user_dict[list_id]} has only 1 name, {split_name[0]}",
                 file=sys.stderr)
         user_dict["last name"] = split_name[0]
 
