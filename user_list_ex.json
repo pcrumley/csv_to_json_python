@@ -1,0 +1,24 @@
+
+{
+   "user_list_size": 3,
+   "user_list": [
+      {
+         "list_id": 1,
+         "first name": "John",
+         "last name": "Doe",
+         "email": "john.doe@gmail.com"
+      },
+      {
+         "list_id": 2,
+         "first name": "Jane",
+         "last name": "Smith",
+         "email": "jane.smith@yahoo.com"
+      },
+      {
+         "list_id": 3,
+         "first name": "Peter",
+         "last name": "Drucker",
+         "email": "the_pd@gmail.com"
+      }
+   ]
+}
