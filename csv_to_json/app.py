@@ -9,7 +9,12 @@ def run(csv_list, json_list, **kwargs):
     """
     for infile, outfile in zip(csv_list, json_list):
         try:
-            extract_transform_write(infile, outfile, **kwargs)
+            py_json_obj = extract_transform(infile, **kwargs)
+            # write it to a file
+            with open(outfile, 'w') as jsonfile:
+                # pretty print for easier debug
+                json.dump(py_json_obj, jsonfile, indent="  ")
+            print(f"Read {infile} and saved to {outfile}")
 
         except CSVSchemaError:
             print(
@@ -17,10 +22,10 @@ def run(csv_list, json_list, **kwargs):
                file=sys.stderr)
 
 
-def extract_transform_write(csv_in: str, json_out: str, **kwargs):
+def extract_transform(csv_in: str, **kwargs):
     """
     The main logical part of the code. Is passed a csv, and
-    a location to write a Json File. Will raise an CSVSchemaError
+    returns a python objec with JSON schema. Will raise an CSVSchemaError
     if csv_schema is unexpected.
     """
     # first convert the csv into a list of dictionaries
@@ -29,15 +34,18 @@ def extract_transform_write(csv_in: str, json_out: str, **kwargs):
     # John Smith,THE_Smiths_Fan02@aol.com
     # ...
     #
-    # out: list of dictionaries that looks like
-    # [
-    #    {
-    #       "list_id": 1
-    #       "first name": "John",
-    #       "last name": "Smith"
-    #       "email": "THE_Smiths_Fan02@aol.com",
-    #    }
-    # ]
+    # out: dictionary that looks like
+    # {
+    #    "user_list_size": 1
+    #    "user_list": [
+    #       {
+    #           "list_id": 1
+    #           "first name": "John",
+    #           "last name": "Smith"
+    #           "email": "THE_Smiths_Fan02@aol.com",
+    #       }
+    #   ]
+    # }
     user_list = csv_to_user_list(csv_in, **kwargs)
 
     # now we need to add the metadata
@@ -51,10 +59,7 @@ def extract_transform_write(csv_in: str, json_out: str, **kwargs):
         "user_list": user_list,
     }
 
-    # write it to a file
-    with open(json_out, 'w') as jsonfile:
-        # pretty print for easier debug
-        json.dump(json_obj, jsonfile, indent="  ")
+    return json_obj
 
 
 def csv_to_user_list(csv_in: str, **kwargs) -> list:
@@ -73,10 +78,7 @@ def csv_to_user_list(csv_in: str, **kwargs) -> list:
         }
         ...
     ]
-
-
     """
-
 
     user_list = []
     with open(csv_in, newline='') as csv_file:
