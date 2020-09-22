@@ -51,7 +51,7 @@ has more information.
 # Project Structure & Testing
 The main file that handles the command line arg parsing is `./csv_to_json.py`
 
-All of the business logic beyond cli parsing is in the `./csv_to_json/main.py`
+All of the business logic beyond cli parsing is in the `./csv_to_json/app.py`
 file, which is relatively self-explanatory.
 
 You can test the code by running `python csv_to_json/tests.py`
